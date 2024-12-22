@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задача коммивояжера</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<!-- Пользовательский интерфейс позволяет задать параметры задачи.
+Для задачи коммивояжера отображается матрица расстояний между городами.
+Также пользовательский интерфейс предоставляет кнопки для запуска и остановки процесса оптимизации.
+В ходе поиска решения отображается номер итерации, лучший экземпляр и его метрика. -->
+
+<body>
+
+    <main>
+
+        <div class="container">
+
+            <form class="child" action="">
+                <label class="item" for="citiesCounter">Введите количество городов:</label>
+                <input class="item" type="text" value="5" name="citiesCounter" id="citiesCounter">
+                <label class="item" for="populationSize">Введите размер популяции:</label>
+                <input class="item" type="text" value="70" name="populationSize" id="populationSize">
+                <button class="item" type="button" onclick="createPopulation()">Создать начальную популяцию</button>
+            </form>
+
+            <div class="child" id="citiesTableContainer">
+                <table id="citiesTable">
+                </table>
+            </div>
+
+
+            <form class="child">
+                <label class="item" id="generationsCounter">Номер поколения: </label>
+                <label class="item" id="bestDistance">Лучшая длина маршрута: </label>
+                <label class="item" id="meanDistance">Средняя длина маршрута: </label>
+            </form>
+
+            <form class="child">
+                <button class="item" type="button" onclick="startEvolution()">Начать эволюцию</button>
+                <!--<button class="item" type="submit">Остановить</button>
+                <button class="item" type="submit">Продолжить</button>
+                <button class="item" type="submit">Завершить эволюцию</button>-->
+            </form>
+
+            <div class="child">
+                <!-- Здесь будет отображаться лучший маршрут -->
+                Здесь будет отображаться лучший маршрут
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+
+        var population;
+
+        async function createPopulation()
+        {
+
+            var citiesCount = document.getElementById('citiesCounter').value;
+            var populationSize = document.getElementById('populationSize').value;
+
+            const response = await fetch(`/api/solver/initial?citiesCount=${ citiesCount }&populationSize=${ populationSize }`, {
+                method: "GET",
+                headers: { "Accept": "application/json;charset=utf-8" },
+
+            });
+
+            if (response.ok === true) {
+
+                population = await response.json();
+
+                const tableContainer = document.getElementById('citiesTableContainer');
+
+                const table = document.getElementById('citiesTable');
+                table.innerHTML = "";
+
+
+                const headerRow = document.createElement('tr');
+                headerRow.appendChild(document.createElement('th')); 
+
+                for (let i = 0; i < population.citiesCount; i++) {
+                    const th = document.createElement('th');
+                    th.textContent = `Город ${i + 1}`;
+                    headerRow.appendChild(th);
+                }
+                table.appendChild(headerRow);
+
+                for (let i = 0; i < population.citiesCount; i++) {
+                    const tableRow = document.createElement('tr');
+                    const rowHeader = document.createElement('th');
+                    rowHeader.textContent = `Город ${i + 1}`;
+                    tableRow.appendChild(rowHeader);
+
+                    for (const cell of population.distances[i]) {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        tableRow.appendChild(td);
+                    }
+                    table.appendChild(tableRow);
+                }
+
+                tableContainer.appendChild(table);
+
+                const generationsCounter = document.getElementById('generationsCounter');
+                generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
+
+                const bestDistance = document.getElementById('bestDistance');
+                bestDistance.innerHTML = "Лучшая длина маршрута: " + population.bestDistance;
+
+                const meanDistance = document.getElementById('meanDistance');
+                meanDistance.innerHTML = "Средняя длина маршрута: " + population.meanDistance;
+
+            }
+            else
+            {
+                alert("HTTP error: " + response.status);
+            }
+
+        }
+
+        async function startEvolution()
+        {
+
+            const response = await fetch(`/api/solver/next`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json;charset=utf-8" },
+                body: JSON.stringify(population)
+            });
+
+            if (response.ok === true) {
+
+                population = await response.json();
+
+                const generationsCounter = document.getElementById('generationsCounter');
+                generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
+
+                const bestDistance = document.getElementById('bestDistance');
+                bestDistance.innerHTML = "Лучшая длина маршрута: " + population.bestDistance;
+
+                const meanDistance = document.getElementById('meanDistance');
+                meanDistance.innerHTML = "Средняя длина маршрута: " + population.meanDistance;
+            }
+            else
+            {
+                alert("ERROR")
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
