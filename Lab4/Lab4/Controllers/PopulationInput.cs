@@ -21,6 +21,8 @@ namespace Lab4.Controllers
 
         public double meanDistance { get; set; }
 
+        public List<int> bestRoute { get; set; }
+
         public PopulationInput()
         {
 
@@ -46,6 +48,7 @@ namespace Lab4.Controllers
             this.generationsCounter = pop.generationsCounter;
             this.bestDistance = pop.bestDistance;
             this.meanDistance = pop.meanDistance;
+            this.bestRoute = pop.bestRoute;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Lab4.Controllers
         [HttpPost("next")]
         public async Task<IActionResult> startEvolution([FromBody] PopulationInput pop)
         {
-            Population population = new Population(pop.routes, pop.distances, pop.citiesCount, pop.populationSize, pop.generationsCounter, pop.bestDistance, pop.meanDistance);
+            Population population = new Population(pop.routes, pop.distances, pop.citiesCount, pop.populationSize, pop.generationsCounter, pop.bestDistance, pop.meanDistance, pop.bestRoute);
             population.evolution();
             var res = await Task.FromResult(JsonConvert.SerializeObject(population));
 

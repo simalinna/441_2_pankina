@@ -24,6 +24,8 @@ namespace ClassLibrary
 
         public double meanDistance { get; set; }
 
+        public List<int> bestRoute { get; set; }
+
 
         public Population(int populationSize, int[,] distances)
         {
@@ -43,9 +45,10 @@ namespace ClassLibrary
 
             bestDistance = getBestDistance();
             meanDistance = getMeanDistance();
+            bestRoute = getBestRoutes()[0].route;
         }
 
-        public Population(List<Chromosome> routes, List<List<int>> distances, int citiesCount, int populationSize, int generationsCounter, double bestDistance, double meanDistance)
+        public Population(List<Chromosome> routes, List<List<int>> distances, int citiesCount, int populationSize, int generationsCounter, double bestDistance, double meanDistance, List<int> bestRoute)
         {
             this.routes = routes;
             this.citiesCount = citiesCount;
@@ -64,6 +67,7 @@ namespace ClassLibrary
             this.generationsCounter =  generationsCounter;
             this.bestDistance = bestDistance;
             this.meanDistance = meanDistance;
+            this.bestRoute = bestRoute;
         }
 
         public string populationToString()
@@ -102,6 +106,7 @@ namespace ClassLibrary
             generationsCounter++;
             bestDistance = getBestDistance();
             meanDistance = getMeanDistance();
+            bestRoute = getBestRoutes()[0].route;
         }
 
         public void mutation(List<Chromosome> newRoutes)

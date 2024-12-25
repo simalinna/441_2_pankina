@@ -45,9 +45,10 @@
                 <button class="item" type="submit">Завершить эволюцию</button>-->
             </form>
 
-            <div class="child">
-                <!-- Здесь будет отображаться лучший маршрут -->
-                Здесь будет отображаться лучший маршрут
+            <div class="child" id="bestRouteContainer">
+                <label class="item" id="bestRoute">Лучший маршрут: </label>
+                <table id="bestRouteTable">
+                </table>
             </div>
 
         </div>
@@ -74,10 +75,10 @@
 
                 population = await response.json();
 
-                const tableContainer = document.getElementById('citiesTableContainer');
+                const citiesTableContainer = document.getElementById('citiesTableContainer');
 
-                const table = document.getElementById('citiesTable');
-                table.innerHTML = "";
+                const citiesTable = document.getElementById('citiesTable');
+                citiesTable.innerHTML = "";
 
 
                 const headerRow = document.createElement('tr');
@@ -88,7 +89,7 @@
                     th.textContent = `Город ${i + 1}`;
                     headerRow.appendChild(th);
                 }
-                table.appendChild(headerRow);
+                citiesTable.appendChild(headerRow);
 
                 for (let i = 0; i < population.citiesCount; i++) {
                     const tableRow = document.createElement('tr');
@@ -101,10 +102,31 @@
                         td.textContent = cell;
                         tableRow.appendChild(td);
                     }
-                    table.appendChild(tableRow);
+                    citiesTable.appendChild(tableRow);
                 }
 
-                tableContainer.appendChild(table);
+                citiesTableContainer.appendChild(citiesTable);
+
+
+                const bestRouteContainer = document.getElementById('bestRouteContainer');
+
+                const bestRouteTable = document.getElementById('bestRouteTable');
+                bestRouteTable.innerHTML = "";
+
+                const headerRow1 = document.createElement('tr');
+
+                const th1 = document.createElement('th');
+                th1.textContent = `Порядок обхода городов`;
+                headerRow1.appendChild(th1);
+
+                for (let i = 0; i < population.citiesCount; i++) {
+                    const th1 = document.createElement('th');
+                    th1.textContent = `Город ${population.bestRoute[i]}`;
+                    headerRow1.appendChild(th1);
+                }
+                bestRouteTable.appendChild(headerRow1);
+                bestRouteContainer.appendChild(bestRouteTable);
+
 
                 const generationsCounter = document.getElementById('generationsCounter');
                 generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
@@ -135,6 +157,25 @@
             if (response.ok === true) {
 
                 population = await response.json();
+
+                const bestRouteContainer = document.getElementById('bestRouteContainer');
+
+                const bestRouteTable = document.getElementById('bestRouteTable');
+                bestRouteTable.innerHTML = "";
+
+                const headerRow1 = document.createElement('tr');
+
+                const th1 = document.createElement('th');
+                th1.textContent = `Порядок обхода городов`;
+                headerRow1.appendChild(th1);
+
+                for (let i = 0; i < population.citiesCount; i++) {
+                    const th1 = document.createElement('th');
+                    th1.textContent = `Город ${population.bestRoute[i]}`;
+                    headerRow1.appendChild(th1);
+                }
+                bestRouteTable.appendChild(headerRow1);
+                bestRouteContainer.appendChild(bestRouteTable);
 
                 const generationsCounter = document.getElementById('generationsCounter');
                 generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
