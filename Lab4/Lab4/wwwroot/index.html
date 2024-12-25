@@ -23,7 +23,7 @@
                 <input class="item" type="text" value="5" name="citiesCounter" id="citiesCounter">
                 <label class="item" for="populationSize">Введите размер популяции:</label>
                 <input class="item" type="text" value="70" name="populationSize" id="populationSize">
-                <button class="item" type="button" onclick="createPopulation()">Создать начальную популяцию</button>
+                <button class="item" id="createPopulationButton" type="button" onclick="createPopulation()" disabled>Создать начальную популяцию</button>
             </form>
 
             <div class="child" id="citiesTableContainer">
@@ -39,10 +39,9 @@
             </form>
 
             <form class="child">
-                <button class="item" type="button" onclick="startEvolution()">Начать эволюцию</button>
-                <!--<button class="item" type="submit">Остановить</button>
-                <button class="item" type="submit">Продолжить</button>
-                <button class="item" type="submit">Завершить эволюцию</button>-->
+                <button class="item" id="startEvolutionButton" type="button" onclick="startEvolution()" disabled>Запустить эволюцию</button>
+                <button class="item" id="stopEvolutionButton" type="button" onclick="stopEvolution()" disabled>Остановить эволюцию</button>
+                <button class="item" id="finishExperimentButton" type="button" onclick="finishExperiment()" disabled>Завершить эксперимент</button>
             </form>
 
             <div class="child" id="bestRouteContainer">
@@ -57,7 +56,17 @@
 
     <script>
 
-        var population;
+        var population = null;
+
+        var evolutionFlag = false;
+
+        const createPopulationButton = document.getElementById('createPopulationButton');
+        const startEvolutionButton = document.getElementById('startEvolutionButton');
+        const stopEvolutionButton = document.getElementById('stopEvolutionButton');
+        const finishExperimentButton = document.getElementById('finishExperimentButton');
+
+        createPopulationButton.disabled = false;
+
 
         async function createPopulation()
         {
@@ -137,6 +146,11 @@
                 const meanDistance = document.getElementById('meanDistance');
                 meanDistance.innerHTML = "Средняя длина маршрута: " + population.meanDistance;
 
+                createPopulationButton.disabled = true;
+                startEvolutionButton.disabled = false;
+                stopEvolutionButton.disabled = true;
+                finishExperimentButton.disabled = false;
+
             }
             else
             {
@@ -145,53 +159,91 @@
 
         }
 
+
         async function startEvolution()
         {
+            evolutionFlag = true;
+            createPopulationButton.disabled = true;
+            startEvolutionButton.disabled = true;
+            stopEvolutionButton.disabled = false;
+            finishExperimentButton.disabled = true;
 
-            const response = await fetch(`/api/solver/next`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json;charset=utf-8" },
-                body: JSON.stringify(population)
-            });
-
-            if (response.ok === true) {
-
-                population = await response.json();
-
-                const bestRouteContainer = document.getElementById('bestRouteContainer');
-
-                const bestRouteTable = document.getElementById('bestRouteTable');
-                bestRouteTable.innerHTML = "";
-
-                const headerRow1 = document.createElement('tr');
-
-                const th1 = document.createElement('th');
-                th1.textContent = `Порядок обхода городов`;
-                headerRow1.appendChild(th1);
-
-                for (let i = 0; i < population.citiesCount; i++) {
-                    const th1 = document.createElement('th');
-                    th1.textContent = `Город ${population.bestRoute[i]}`;
-                    headerRow1.appendChild(th1);
-                }
-                bestRouteTable.appendChild(headerRow1);
-                bestRouteContainer.appendChild(bestRouteTable);
-
-                const generationsCounter = document.getElementById('generationsCounter');
-                generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
-
-                const bestDistance = document.getElementById('bestDistance');
-                bestDistance.innerHTML = "Лучшая длина маршрута: " + population.bestDistance;
-
-                const meanDistance = document.getElementById('meanDistance');
-                meanDistance.innerHTML = "Средняя длина маршрута: " + population.meanDistance;
-            }
-            else
+            while (true)
             {
-                alert("ERROR")
+                if (!evolutionFlag)
+                {
+                    break;
+                }
+
+                const response = await fetch(`/api/solver/next`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json;charset=utf-8" },
+                    body: JSON.stringify(population)
+                });
+
+                if (response.ok === true) {
+
+                    population = await response.json();
+
+                    const bestRouteContainer = document.getElementById('bestRouteContainer');
+
+                    const bestRouteTable = document.getElementById('bestRouteTable');
+                    bestRouteTable.innerHTML = "";
+
+                    const headerRow1 = document.createElement('tr');
+
+                    const th1 = document.createElement('th');
+                    th1.textContent = `Порядок обхода городов`;
+                    headerRow1.appendChild(th1);
+
+                    for (let i = 0; i < population.citiesCount; i++) {
+                        const th1 = document.createElement('th');
+                        th1.textContent = `Город ${population.bestRoute[i]}`;
+                        headerRow1.appendChild(th1);
+                    }
+                    bestRouteTable.appendChild(headerRow1);
+                    bestRouteContainer.appendChild(bestRouteTable);
+
+                    const generationsCounter = document.getElementById('generationsCounter');
+                    generationsCounter.innerHTML = "Номер поколения: " + population.generationsCounter;
+
+                    const bestDistance = document.getElementById('bestDistance');
+                    bestDistance.innerHTML = "Лучшая длина маршрута: " + population.bestDistance;
+
+                    const meanDistance = document.getElementById('meanDistance');
+                    meanDistance.innerHTML = "Средняя длина маршрута: " + population.meanDistance;
+
+                    await new Promise(r => setTimeout(r, 300));
+                }
+                else {
+                    alert("ERROR")
+                }
             }
 
         }
+
+
+        function stopEvolution()
+        {
+            evolutionFlag = false;
+            stopEvolutionButton.disabled = true;
+            createPopulationButton.disabled = true;
+            startEvolutionButton.disabled = false;
+            finishExperimentButton.disabled = false;
+        }
+
+
+        function finishExperiment()
+        {
+            population = null;
+            finishExperimentButton.disabled = true;
+            startEvolutionButton.disabled = true;
+            stopEvolutionButton.disabled = true;
+            createPopulationButton.disabled = false;
+            bestRouteTable.innerHTML = "";
+            citiesTable.innerHTML = "";
+        }
+
 
     </script>
 

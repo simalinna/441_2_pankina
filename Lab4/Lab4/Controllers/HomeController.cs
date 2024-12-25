@@ -44,13 +44,20 @@ namespace Lab4.Controllers
 
 
         [HttpPost("next")]
-        public async Task<IActionResult> startEvolution([FromBody] PopulationInput pop)
+        public async Task<IActionResult> makeEvolution([FromBody] PopulationDeserialized pop)
         {
-            Population population = new Population(pop.routes, pop.distances, pop.citiesCount, pop.populationSize, pop.generationsCounter, pop.bestDistance, pop.meanDistance, pop.bestRoute);
-            population.evolution();
-            var res = await Task.FromResult(JsonConvert.SerializeObject(population));
+            try
+            {
+                Population population = new Population(pop.routes, pop.distances, pop.citiesCount, pop.populationSize, pop.generationsCounter, pop.bestDistance, pop.meanDistance, pop.bestRoute);
+                population.evolution();
+                var res = await Task.FromResult(JsonConvert.SerializeObject(population));
 
-            return Ok(res);
+                return Ok(res);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

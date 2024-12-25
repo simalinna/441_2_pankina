@@ -2,7 +2,7 @@
 
 namespace Lab4.Controllers
 {
-    public class PopulationInput
+    public class PopulationDeserialized
     {
 
         public List<Chromosome> routes { get; set; }
@@ -23,12 +23,12 @@ namespace Lab4.Controllers
 
         public List<int> bestRoute { get; set; }
 
-        public PopulationInput()
+        public PopulationDeserialized()
         {
 
         }
 
-        public PopulationInput(Population pop)
+        public PopulationDeserialized(Population pop)
         {
             this.routes = pop.routes;
             this.citiesCount = pop.citiesCount;
