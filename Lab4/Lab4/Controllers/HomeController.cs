@@ -24,8 +24,14 @@ namespace Lab4.Controllers
         {
             try
             {
-                if (citiesCount > 20)
-                    return BadRequest("Введите значение не более 20");
+                if (citiesCount < 5)
+                    return BadRequest("Количество городов должно быть больше 5!");
+
+                if (citiesCount > 100)
+                    return BadRequest("Количество городов должно быть не более 100!");
+
+                if (populationSize <= 1)
+                    return BadRequest("Количество экземпляров в популяции должно быть больше 1!");
 
                 RandomDistances randomDistances = new RandomDistances(citiesCount);
                 int[,] distances = randomDistances.distances;

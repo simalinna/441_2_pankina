@@ -26,6 +26,11 @@ namespace ClassLibrary
 
         public List<int> bestRoute { get; set; }
 
+        public Population()
+        {
+
+        }
+
 
         public Population(int populationSize, int[,] distances)
         {
